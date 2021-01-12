@@ -63,6 +63,7 @@ def create_classifier(_type='svm'):
     elif _type == 'gbc':
         clf_obj = GradientBoostingClassifier()
 
+
     clf_pipeline_object = Pipeline(
         steps=(
             ('preprocess_1',StandardScaler()),
@@ -84,6 +85,21 @@ def preprocess_data(
     train_df, test_df = train_test_split(data_df, test_size = test_ratio)
     return data_df, train_df, test_df
 
+def run_classifier(clf_obj, train_df, test_df=None, x_features=None, y_column='y'):
+
+    clf_obj.fit(train_df[x_features], train_df[y_column])
+    score = clf_obj.score(train_df[x_features], train_df[y_column])
+    print('Training Error Score', score)
+    if test_df is not None:
+        y_pred = clf_obj.predict(test_df[x_features], test_df[y_column])
+        y_true = test_df[y_column]
+        clf_report = classification_report(y_true,y_pred)
+        print(clf_report)
+    return clf_obj
+
 data_df = read_data()
-data_df, train_df, test_df = preprocess_data(data_df)
+x_features = []
+y_column ='y'
+data_df, train_df, test_df = preprocess_data(data_df, x_features)
 clf_obj = create_classifier(_type='LR')
+clf_obj = trainNeval_model(clf_obj, train_df, test_df, x_features, y_column='y')
